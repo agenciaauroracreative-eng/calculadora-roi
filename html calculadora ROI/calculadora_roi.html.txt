@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de ROI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 40px;
+        }
+
+        .input-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            border-left: 5px solid #3498db;
+        }
+
+        .results-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            border-left: 5px solid #27ae60;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #34495e;
+        }
+
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .currency {
+            position: relative;
+        }
+
+        .currency::before {
+            content: 'R$';
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+            font-weight: bold;
+        }
+
+        .currency input {
+            padding-left: 35px;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(52, 152, 219, 0.3);
+        }
+
+        .result-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #27ae60;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .result-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .result-label {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .roi-positive {
+            color: #27ae60;
+        }
+
+        .roi-negative {
+            color: #e74c3c;
+        }
+
+        .interpretation {
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .interpretation h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .table-container {
+            margin-top: 30px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #34495e;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .export-btn {
+            background: #27ae60;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+            font-size: 0.9em;
+            transition: background 0.3s;
+        }
+
+        .export-btn:hover {
+            background: #229954;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Calculadora de ROI</h1>
+            <p>Calcule o Retorno sobre o Investimento de forma profissional</p>
+        </div>
+
+        <div class="main-content">
+            <div class="input-section">
+                <h2 class="section-title">💰 Dados do Investimento</h2>
+                
+                <div class="form-group">
+                    <label for="projectName">Nome do Projeto/Investimento:</label>
+                    <input type="text" id="projectName" placeholder="Ex: Campanha Marketing Digital">
+                </div>
+
+                <div class="form-group">
+                    <label for="initialInvestment">Investimento Inicial:</label>
+                    <div class="currency">
+                        <input type="number" id="initialInvestment" placeholder="10000" step="0.01">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="totalRevenue">Receita Total Gerada:</label>
+                    <div class="currency">
+                        <input type="number" id="totalRevenue" placeholder="15000" step="0.01">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="operationalCosts">Custos Operacionais:</label>
+                    <div class="currency">
+                        <input type="number" id="operationalCosts" placeholder="2000" step="0.01">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="timePeriod">Período de Análise (meses):</label>
+                    <input type="number" id="timePeriod" placeholder="12" min="1">
+                </div>
+
+                <button class="calculate-btn" onclick="calculateROI()">🚀 Calcular ROI</button>
+            </div>
+
+            <div class="results-section">
+                <h2 class="section-title">📈 Resultados</h2>
+                
+                <div class="result-card">
+                    <div class="result-value" id="roiPercentage">--</div>
+                    <div class="result-label">ROI Percentual</div>
+                </div>
+
+                <div class="result-card">
+                    <div class="result-value" id="netProfit">R$ --</div>
+                    <div class="result-label">Lucro Líquido</div>
+                </div>
+
+                <div class="result-card">
+                    <div class="result-value" id="paybackPeriod">-- meses</div>
+                    <div class="result-label">Período de Payback</div>
+                </div>
+
+                <div class="interpretation" id="interpretation">
+                    <h3>💡 Interpretação dos Resultados</h3>
+                    <p>Insira os dados para ver a análise do seu investimento.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container" style="margin: 30px;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Histórico de Cálculos</th>
+                        <th>Investimento</th>
+                        <th>Receita</th>
+                        <th>ROI</th>
+                        <th>Data</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTable">
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: #7f8c8d;">Nenhum cálculo realizado ainda</td>
+                    </tr>
+                </tbody>
+            </table>
+            <button class="export-btn" onclick="exportToCSV()">📥 Exportar Histórico (CSV)</button>
+        </div>
+    </div>
+
+    <script>
+        let calculationHistory = [];
+
+        function calculateROI() {
+            // Obter valores dos inputs
+            const projectName = document.getElementById('projectName').value || 'Sem nome';
+            const initialInvestment = parseFloat(document.getElementById('initialInvestment').value) || 0;
+            const totalRevenue = parseFloat(document.getElementById('totalRevenue').value) || 0;
+            const operationalCosts = parseFloat(document.getElementById('operationalCosts').value) || 0;
+            const timePeriod = parseFloat(document.getElementById('timePeriod').value) || 1;
+
+            // Validações
+            if (initialInvestment <= 0) {
+                alert('Por favor, insira um valor válido para o investimento inicial.');
+                return;
+            }
+
+            // Cálculos
+            const netRevenue = totalRevenue - operationalCosts;
+            const netProfit = netRevenue - initialInvestment;
+            const roiPercentage = ((netProfit / initialInvestment) * 100).toFixed(2);
+            const paybackPeriod = initialInvestment > 0 ? (initialInvestment / (netRevenue / timePeriod)).toFixed(1) : 0;
+
+            // Atualizar resultados na tela
+            document.getElementById('roiPercentage').textContent = roiPercentage + '%';
+            document.getElementById('roiPercentage').className = 'result-value ' + (roiPercentage >= 0 ? 'roi-positive' : 'roi-negative');
+            
+            document.getElementById('netProfit').textContent = 'R$ ' + netProfit.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+            document.getElementById('paybackPeriod').textContent = paybackPeriod + ' meses';
+
+            // Interpretação dos resultados
+            let interpretation = '';
+            if (roiPercentage > 20) {
+                interpretation = '🎉 <strong>Excelente ROI!</strong> Seu investimento está gerando retornos muito bons. ROI acima de 20% é considerado excelente na maioria dos setores.';
+            } else if (roiPercentage > 10) {
+                interpretation = '👍 <strong>Bom ROI!</strong> Seu investimento está apresentando retornos satisfatórios. Um ROI entre 10-20% é considerado bom.';
+            } else if (roiPercentage > 0) {
+                interpretation = '⚠️ <strong>ROI Positivo, mas baixo.</strong> O investimento está gerando lucro, mas você pode buscar formas de otimizar o retorno.';
+            } else {
+                interpretation = '❌ <strong>ROI Negativo!</strong> O investimento está gerando prejuízo. Revise sua estratégia ou considere alternativas.';
+            }
+
+            document.getElementById('interpretation').innerHTML = '<h3>💡 Interpretação dos Resultados</h3><p>' + interpretation + '</p>';
+
+            // Adicionar ao histórico
+            const calculation = {
+                project: projectName,
+                investment: initialInvestment,
+                revenue: totalRevenue,
+                roi: roiPercentage,
+                profit: netProfit,
+                date: new Date().toLocaleDateString('pt-BR')
+            };
+            
+            calculationHistory.unshift(calculation);
+            updateHistoryTable();
+        }
+
+        function updateHistoryTable() {
+            const tbody = document.getElementById('historyTable');
+            
+            if (calculationHistory.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #7f8c8d;">Nenhum cálculo realizado ainda</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            calculationHistory.slice(0, 10).forEach(calc => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${calc.project}</td>
+                    <td>R$ ${calc.investment.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                    <td>R$ ${calc.revenue.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                    <td class="${calc.roi >= 0 ? 'roi-positive' : 'roi-negative'}">${calc.roi}%</td>
+                    <td>${calc.date}</td>
+                `;
+            });
+        }
+
+        function exportToCSV() {
+            if (calculationHistory.length === 0) {
+                alert('Nenhum dado para exportar!');
+                return;
+            }
+
+            let csv = 'Projeto,Investimento,Receita,ROI,Lucro,Data\n';
+            calculationHistory.forEach(calc => {
+                csv += `"${calc.project}",${calc.investment},${calc.revenue},${calc.roi},${calc.profit},"${calc.date}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'historico_roi.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Adicionar eventos para calcular automaticamente quando os valores mudarem
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('input[type="number"]');
+            inputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    // Auto-calcular após 1 segundo de inatividade
+                    clearTimeout(this.timeout);
+                    this.timeout = setTimeout(calculateROI, 1000);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
